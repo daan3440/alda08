@@ -15,6 +15,9 @@ public class HuffmanTest {
 
 	private Huffman huff = new Huffman();
 
+	private void makeString() {
+		
+	}
 //	private void add(String... nodes) {
 //		for (String node : nodes) {
 //			assertTrue("Unable to add node " + node, graph.add(node));
