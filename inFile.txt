@@ -1,0 +1,1 @@
+Huffman codes compress data very effectively: savings of 20% to 90% are typical, depending on the characteristics of the data being compressed.
