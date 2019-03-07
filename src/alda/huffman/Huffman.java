@@ -152,7 +152,7 @@ public String encode(String originalStr,
 			try {
 //				if (args.length < 2)
 //					throw new Exception("Incorrect number of parameters to program.");
-				inputFileName = "/Users/daniel/Documents/000_eclipse_workspace/ALDA08/inFile.txt";//args[0];
+				inputFileName = "AAAABBBCCDDFFSSSSAAWWÅQPLLL";//args[0];
 				if(inputFileName != null)
 					System.out.println("notNULL");
 				outputFileName = "/Users/daniel/Documents/000_eclipse_workspace/ALDA08/outFile.txt";// args[1];
