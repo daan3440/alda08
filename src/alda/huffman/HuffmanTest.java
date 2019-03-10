@@ -243,7 +243,6 @@ public class HuffmanTest {
 		File pathFile = new File(path);
 		preEncode= huff.readFile(path, StandardCharsets.UTF_8);
 		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
-		System.out.println("Stats: " + stats);
 		String encodedBinString = huff.encode(preEncode, stats);
 		String decodedString = huff.decode(encodedBinString, stats);
 		File decodedFile = new File(decodedOutputFileName);
