@@ -204,7 +204,7 @@ public class HuffmanTest {
 		String encodedBinString = huff.encode(preEncode, stats);
 		assertTrue(preEncode.length() < encodedBinString.length());	
 	}
-	
+
 	@Test
 	public void decodedBinStringBigFileTest() throws IOException {
 		String path = inputFileName;

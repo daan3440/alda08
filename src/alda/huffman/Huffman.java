@@ -40,18 +40,18 @@ public class Huffman {
 		Map<Character, String> direction = new HashMap<Character, String>();
 		for (Node leafNode : leafNodes) {
 			Character character = new Character(leafNode.getChars().charAt(0));
-			String leftOrRight = "";
+			String keyForChar = "";
 			Node currentNode = leafNode;
 
 			while (currentNode.getParent() != null) {
 				if (currentNode.isLeftChild()) {
-					leftOrRight = "0" + leftOrRight;
+					keyForChar = "0" + keyForChar;
 				} else {
-					leftOrRight = "1" + leftOrRight;
+					keyForChar = "1" + keyForChar;
 				}
 				currentNode = currentNode.getParent();
 			}
-			direction.put(character, leftOrRight);
+			direction.put(character, keyForChar);
 		}
 		return direction;
 	}
@@ -81,7 +81,9 @@ public class Huffman {
 				Node node2 = prioQueue.poll();
 				Node sumNode = new Node();
 				sumNode.setChars(node1.getChars() + node2.getChars());
+//				System.out.println("Node chars: " + sumNode.getChars().toString());
 				sumNode.setFrequence(node1.getFrequence() + node2.getFrequence());
+//				System.out.println("Node Freq: " + sumNode.getFrequence());
 				sumNode.setLeftNode(node1);
 				sumNode.setRightNode(node2);
 				node1.setParent(sumNode);
@@ -107,7 +109,10 @@ public class Huffman {
 		StringBuffer buffer = new StringBuffer();
 		for (char c : charArray) {
 			Character character = new Character(c);
+//			System.out.println("Chars: " + character);
+
 			buffer.append(encodInfo.get(character));
+//			System.out.println("ReturnBuffer: " + buffer);
 		}
 		return buffer.toString();
 	}
@@ -166,9 +171,9 @@ public class Huffman {
 				String encodedBinString = encode(preEncode, stats);
 				String decodedString = decode(encodedBinString, stats);
 
-				System.out.println("Original String: " + preEncode);
-				System.out.println("Huffman encoded: " + encodedBinString);
-				System.out.println("Decoded: " + decodedString);	
+//				System.out.println("Original String: " + preEncode);
+//				System.out.println("Huffman encoded: " + encodedBinString);
+//				System.out.println("Decoded: " + decodedString);	
 
 				outStream = new FileOutputStream(outputFileName);
 				writer = new OutputStreamWriter(outStream);
@@ -182,8 +187,8 @@ public class Huffman {
 				writer.flush();
 				writer.close();
 			}
-			catch (Exception exception) {
-				System.out.println("Exception inner: " + exception);
+			catch (Exception e) {
+				System.out.println("Exception inner: " + e);
 			}
 			finally {
 				if (writer != null)
@@ -192,8 +197,8 @@ public class Huffman {
 					outStream.close();
 			}
 		}
-		catch (Exception exception) {
-			System.out.println("Exception outer: " + exception);
+		catch (Exception e) {
+			System.out.println("Exception outer: " + e);
 		}
 	}
 
