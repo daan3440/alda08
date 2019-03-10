@@ -1,1 +1,13 @@
-abc
+Instruktioner för veckans inlämningsuppgift
+Obs! Det går inte att lämna in denna uppgift om du inte blivit godkänd på muntafrågorna.
+
+Veckouppgiften denna vecka är att implementera en av uppgifterna ur kursboken. Det du ska lämna in är en zip-fil med koden och en kort rapport (pdf-format, skriven i latex, följandes mallen, etc.) som beskriver hur implementationen fungerar och vilka designval du gjort.
+
+De uppgifter du kan välja på är följande:
+
+implementera komprimering och dekomprimering av filer med hjälp av Huffmankodning. (giriga algoritmer, uppgift 10.7 i andra upplagan) I upplaga 3 är denna uppgift borttagen, men uppgiftstexten var denna: "10.7 Write a program to implement file compression (and uncompression) using Huffman’s algorithm".
+implementera closest-pairalgoritmen från boken. (divide and conquer, uppgift 10.16 eller 10.17 beroende på upplaga)
+implementera en backtrackingalgoritm för det så kallade åttadamersproblemet. (uppgift 10.58b eller 10.59b beroende på upplaga)
+implementera en algoritm för att dela upp ord i rader med hjälp av dynamisk programmering. (uppgift 10.52a eller 10.53a beroende på upplaga)
+implementera insättning, borttag och sökning i en skip list. (slumpmässiga algoritmer, uppgift 10.36 eller 10.37 beroende på upplaga)
+Samtliga dessa uppgifter kan återanvändas som programmeringsprojekt på muntan, men som vanligt för veckouppgifterna så kan de bara ge godkänd, inte VG. Tänk också på kravet på att minst en (icketrivial) metod ska vara ordentligt dokumenterad om du vill använda uppgifterna på detta sätt.
