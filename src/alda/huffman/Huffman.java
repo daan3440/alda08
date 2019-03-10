@@ -1,14 +1,17 @@
 package alda.huffman;
+/*
+ * ALDA08 - Algoritmdesigntekniker
+ * Huffman
+ * Daniel Andersson - daan3440
+ *  
+ */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -18,10 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-
 public class Huffman {
-
-private Map<Character, Integer> statistics(char[] charArray) {
+	//Visibility for testing
+	Map<Character, Integer> stats(char[] charArray) {
 		Map<Character, Integer> map = new HashMap<Character, Integer>();
 		for (char c : charArray) {
 			Character character = new Character(c);
@@ -32,106 +34,100 @@ private Map<Character, Integer> statistics(char[] charArray) {
 			}
 		}
 		return map;
-}
-
-	private Map<Character, String> buildEncodingInfo(List<Node> leafNodes) {
-		Map<Character, String> codewords = new HashMap<Character, String>();
-		for (Node leafNode : leafNodes) {
-			Character character = new Character(leafNode.getChars().charAt(0));
-			String codeword = "";
-			Node currentNode = leafNode;
- 
-			do {
-				if (currentNode.isLeftChild()) {
-					codeword = "0" + codeword;
-				} else {
-					codeword = "1" + codeword;
-				}
- 
-				currentNode = currentNode.getParent();
-			} while (currentNode.getParent() != null);
- 
-			codewords.put(character, codeword);
-		}
-		return codewords;
 	}
 
-private static Tree buildTree(Map<Character, Integer> statistics,
-			List<Node> leafs) {
-		Character[] keys = statistics.keySet().toArray(new Character[0]);
- 
-		PriorityQueue<Node> priorityQueue = new PriorityQueue<Node>();
+	private Map<Character, String> buildEncodingInfo(List<Node> leafNodes) {
+		Map<Character, String> direction = new HashMap<Character, String>();
+		for (Node leafNode : leafNodes) {
+			Character character = new Character(leafNode.getChars().charAt(0));
+			String leftOrRight = "";
+			Node currentNode = leafNode;
+
+			while (currentNode.getParent() != null) {
+				if (currentNode.isLeftChild()) {
+					leftOrRight = "0" + leftOrRight;
+				} else {
+					leftOrRight = "1" + leftOrRight;
+				}
+				currentNode = currentNode.getParent();
+			}
+			direction.put(character, leftOrRight);
+		}
+		return direction;
+	}
+
+	private Tree createTree(Map<Character, Integer> stats, List<Node> leafs) {
+		Character[] keys = stats.keySet().toArray(new Character[0]);
+		PriorityQueue<Node> prioQueue = new PriorityQueue<Node>();
 		for (Character character : keys) {
 			Node node = new Node();
 			node.setChars(character.toString());
-			node.setFrequence(statistics.get(character));
-			priorityQueue.add(node);
+			node.setFrequence(stats.get(character));
+			prioQueue.add(node);
 			leafs.add(node);
 		}
- 
-		int size = priorityQueue.size();
-		for (int i = 1; i <= size - 1; i++) {
-			Node node1 = priorityQueue.poll();
-			Node node2 = priorityQueue.poll();
- 
+		if(prioQueue.size()== 1) {
+			Node node1 = prioQueue.poll();
 			Node sumNode = new Node();
-			sumNode.setChars(node1.getChars() + node2.getChars());
-			sumNode.setFrequence(node1.getFrequence() + node2.getFrequence());
- 
+			sumNode.setChars(node1.getChars());
+			sumNode.setFrequence(node1.getFrequence());
 			sumNode.setLeftNode(node1);
-			sumNode.setRightNode(node2);
- 
 			node1.setParent(sumNode);
-			node2.setParent(sumNode);
- 
-			priorityQueue.add(sumNode);
+			prioQueue.add(sumNode);
+		}else {
+			int size = prioQueue.size() ;
+			for (int i = 1; i <= size- 1; i++) {
+				Node node1 = prioQueue.poll();
+				Node node2 = prioQueue.poll();
+				Node sumNode = new Node();
+				sumNode.setChars(node1.getChars() + node2.getChars());
+				sumNode.setFrequence(node1.getFrequence() + node2.getFrequence());
+				sumNode.setLeftNode(node1);
+				sumNode.setRightNode(node2);
+				node1.setParent(sumNode);
+				node2.setParent(sumNode);
+				prioQueue.add(sumNode);
+			}
 		}
- 
 		Tree tree = new Tree();
-		tree.setRoot(priorityQueue.poll());
+		tree.setRoot(prioQueue.poll());
 		return tree;
-}
+	}
 
-public String encode(String originalStr,
-			Map<Character, Integer> statistics) {
-		if (originalStr == null || originalStr.equals("")) {
+	//Visibility for testing
+	String encode(String originalString, Map<Character, Integer> stats) {
+		if (originalString == null || originalString.equals("")) {
 			return "";
 		}
- 
-		char[] charArray = originalStr.toCharArray();
+		char[] charArray = originalString.toCharArray();
 		List<Node> leafNodes = new ArrayList<Node>();
-		buildTree(statistics, leafNodes);
+		createTree(stats, leafNodes);
 		Map<Character, String> encodInfo = buildEncodingInfo(leafNodes);
- 
+
 		StringBuffer buffer = new StringBuffer();
 		for (char c : charArray) {
 			Character character = new Character(c);
 			buffer.append(encodInfo.get(character));
 		}
- 
 		return buffer.toString();
-}
-	public String decode(String binaryStr,
-			Map<Character, Integer> statistics) {
+	}
+	//Visibility for testing
+	String decode(String binaryStr,Map<Character, Integer> stats) {
 		if (binaryStr == null || binaryStr.equals("")) {
 			return "";
 		}
- 
 		char[] binaryCharArray = binaryStr.toCharArray();
 		LinkedList<Character> binaryList = new LinkedList<Character>();
 		int size = binaryCharArray.length;
 		for (int i = 0; i < size; i++) {
 			binaryList.addLast(new Character(binaryCharArray[i]));
 		}
- 
 		List<Node> leafNodes = new ArrayList<Node>();
-		Tree tree = buildTree(statistics, leafNodes);
- 
-		StringBuffer buffer = new StringBuffer();
- 
+		Tree tree = createTree(stats, leafNodes);
+		StringBuffer returnBuffer = new StringBuffer();
 		while (binaryList.size() > 0) {
 			Node node = tree.getRoot();
- 
+
 			do {
 				Character c = binaryList.removeFirst();
 				if (c.charValue() == '0') {
@@ -140,80 +136,56 @@ public String encode(String originalStr,
 					node = node.getRightNode();
 				}
 			} while (!node.isLeaf());
- 
-			buffer.append(node.getChars());
+			returnBuffer.append(node.getChars());
 		}
- 
-		return buffer.toString();
+		return returnBuffer.toString();
 	}
-	
-	private String readFile(String path, Charset encoding) 
-			  throws IOException 
-			{
-			  byte[] encoded = Files.readAllBytes(Paths.get(path));
-			  return new String(encoded, encoding);
-			}
-	
+	String readFile(String path, Charset encoding) 
+			throws IOException 
+	{
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
+	}
+
 	private void run() {
 		String inputFileName = null;
 		String outputFileName = null;
 		String expandFileName = null;
 		FileOutputStream outStream = null;
 		OutputStreamWriter writer = null;
-		
+
 		try {
 			try {
 				inputFileName = "inFile.txt";//args[0];
 				outputFileName = "outFile.txt";// args[1];
-				expandFileName= "expandedFile.txt";// args[1];
+				expandFileName= "expandedFile.txt";// args[2];
 
-				
-				//Read File and Save String
 				String preEncode = readFile(inputFileName, StandardCharsets.UTF_8);
-				Map<Character, Integer> statistics = statistics(preEncode.toCharArray());
-//				System.out.print("Map Values: ");
-//				for ( Character n : statistics.keySet()) {
-//					System.out.println(n.charValue() + " ");
-//				}
-				String encodedBinariStr = encode(preEncode, statistics);
-				String decodedStr = decode(encodedBinariStr, statistics);
-				
-				
-				//TODO Printout Stream
+				Map<Character, Integer> stats = stats(preEncode.toCharArray());
+
+				String encodedBinString = encode(preEncode, stats);
+				String decodedString = decode(encodedBinString, stats);
+
 				System.out.println("Original String: " + preEncode);
-				System.out.println("Huffman encoded binary string: " + encodedBinariStr);
-				System.out.println("decoded string from binary string: " + decodedStr);
-				
-				System.out.println("binary string of UTF-8: "
-						+ getStringOfByte(preEncode, Charset.forName("UTF-8")));
-				System.out.println("binary string of UTF-16: "
-						+ getStringOfByte(preEncode, Charset.forName("UTF-16")));
-				System.out.println("binary string of US-ASCII: "
-						+ getStringOfByte(preEncode, Charset.forName("US-ASCII")));
-				System.out.println("binary string of GB2312: "
-						+ getStringOfByte(preEncode, Charset.forName("GB2312")));
-				
-				//TODO OUTPUT
+				System.out.println("Huffman encoded: " + encodedBinString);
+				System.out.println("Decoded: " + decodedString);	
+
 				outStream = new FileOutputStream(outputFileName);
 				writer = new OutputStreamWriter(outStream);
-				writer.write(encodedBinariStr);
+				writer.write(encodedBinString);
 				writer.flush();
 				writer.close();
 
 				outStream = new FileOutputStream(expandFileName);
 				writer = new OutputStreamWriter(outStream);
-				writer.write(decodedStr);
+				writer.write(decodedString);
 				writer.flush();
 				writer.close();
-
-
 			}
 			catch (Exception exception) {
-				System.out.println("EXCEPTION 1: " + exception);
+				System.out.println("Exception inner: " + exception);
 			}
 			finally {
-//				if (parser != null)
-//					parser.close();
 				if (writer != null)
 					writer.close();
 				if (outStream != null)
@@ -221,38 +193,88 @@ public String encode(String originalStr,
 			}
 		}
 		catch (Exception exception) {
-			System.out.println("EXCEPTION 2: " + exception);
+			System.out.println("Exception outer: " + exception);
 		}
 	}
 
-	public String getStringOfByte(String str, Charset charset) {
-		if (str == null || str.equals("")) {
-			return "";
-		}
-
-		byte[] byteArray = str.getBytes(charset);
-		int size = byteArray.length;
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < size; i++) {
-			byte temp = byteArray[i];
-			buffer.append(getStringOfByte(temp));
-		}
-
-		return buffer.toString();
-	}
-
-	public String getStringOfByte(byte b) {
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 7; i >= 0; i--) {
-			byte temp = (byte) ((b >> i) & 0x1);
-			buffer.append(String.valueOf(temp));
-		}
-		return buffer.toString();
-	}
-		
-	
-	
 	public static void main(String[] args) {
 		new Huffman().run();
+	}
+}
+
+class Tree {
+	private Node root;
+
+	public Node getRoot() {
+		return root;
+	}
+
+	public void setRoot(Node root) {
+		this.root = root;
+	}
+}
+
+class Node implements Comparable<Node> {
+	private String chars = "";
+	private int freq = 0;
+	private Node parent;
+	private Node leftNode;
+	private Node rightNode;
+
+	@Override
+	public int compareTo(Node n) {
+		return freq - n.freq;
+	}
+
+	public boolean isLeaf() {
+		return chars.length() == 1;
+	}
+
+	public boolean isRoot() {
+		return parent == null;
+	}
+
+	public boolean isLeftChild() {
+		return parent != null && this == parent.leftNode;
+	}
+
+	public int getFrequence() {
+		return freq;
+	}
+
+	public void setFrequence(int frequence) {
+		this.freq = frequence;
+	}
+
+	public String getChars() {
+		return chars;
+	}
+
+	public void setChars(String chars) {
+		this.chars = chars;
+	}
+
+	public Node getParent() {
+		return parent;
+	}
+
+	public void setParent(Node parent) {
+		this.parent = parent;
+	}
+
+	public Node getLeftNode() {
+		return leftNode;
+	}
+
+	public void setLeftNode(Node leftNode) {
+		this.leftNode = leftNode;
+	}
+
+	public Node getRightNode() {
+		return rightNode;
+	}
+
+	public void setRightNode(Node rightNode) {
+		this.rightNode = rightNode;
 	}
 }

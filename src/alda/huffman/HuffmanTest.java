@@ -1,310 +1,290 @@
-// Ändra inte på paketet
 package alda.huffman;
-
+/*
+ * ALDA08 - Algoritmdesigntekniker
+ * Huffman
+ * Daniel Andersson - daan3440
+ *  
+ */
 import static org.junit.Assert.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+
+import java.util.Map;
+
 
 import org.junit.*;
 
 public class HuffmanTest {
+	private String inputFileName = "inFile.txt";
+	private String inputFileNameAbcd = "abcd.txt";
+	private String encodedOutputFileName = "encodedFile.txt";
+	private String decodedOutputFileName= "decodedFile.txt";
+	private String preEncode;
 
-	private static final String[] STANDARD_NODES = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+	private FileOutputStream outStream = null;
+	private OutputStreamWriter writer = null;
+
+	private String defaultString = "Just idag är jag stark";
 
 	private Huffman huff = new Huffman();
 
-	private void makeString() {
-		
+	@Test
+	public void testPath() throws IOException {
+		assertEquals("abcd.txt", inputFileNameAbcd);
 	}
-//	private void add(String... nodes) {
-//		for (String node : nodes) {
-//			assertTrue("Unable to add node " + node, graph.add(node));
-//		}
-//	}
-//
-//	private void connect(String node1, String node2, int cost) {
-//		assertTrue(graph.connect(node1, node2, cost));
-//		assertEquals(cost, graph.getCost(node1, node2));
-//		assertEquals(cost, graph.getCost(node2, node1));
-//	}
-//
-//	private void addExampleNodes() {
-//		add(STANDARD_NODES);
-//	}
-//
-//	@Test
-//	public void testAdd() {
-//		addExampleNodes();
-//		assertFalse(graph.add("D"));
-//		assertFalse(graph.add("J"));
-//		assertTrue(graph.add("K"));
-//	}
-//
-//	@Test
-//	public void testConnect() {
-//		addExampleNodes();
-//		assertFalse(graph.isConnected("A", "Z"));
-//		assertFalse(graph.connect("A", "Z", 5));
-//		assertEquals(-1, graph.getCost("A", "Z"));
-//		assertFalse(graph.connect("X", "B", 5));
-//		assertEquals(-1, graph.getCost("X", "B"));
-//		assertEquals(-1, graph.getCost("B", "X"));
-//
-//		assertFalse(graph.isConnected("A", "G"));
-//		assertFalse(graph.isConnected("G", "A"));
-//		assertTrue(graph.connect("A", "G", 5));
-//		assertTrue(graph.isConnected("A", "G"));
-//		assertTrue(graph.isConnected("G", "A"));
-//		assertEquals(5, graph.getCost("A", "G"));
-//		assertEquals(5, graph.getCost("G", "A"));
-//		assertTrue(graph.connect("G", "A", 3));
-//		assertEquals(3, graph.getCost("A", "G"));
-//		assertEquals(3, graph.getCost("G", "A"));
-//	}
-//
-//	@Test
-//	public void testTooLowWeight() {
-//		addExampleNodes();
-//		assertFalse(graph.connect("A", "B", 0));
-//		assertFalse(graph.connect("C", "D", -1));
-//	}
-//
-//	// Nedanstående kod är skriven i ett format för att beskriva grafer som
-//	// heter dot och kan användas om ni vill ha en bild av den graf som
-//	// nedanående test använder. Det finns flera program och webbsidor man kan
-//	// använda för att omvandla koden till en bild, bland annat
-//	// http://sandbox.kidstrythisathome.com/erdos/
-//
-//	// Observera dock att vi kommer att köra testfall på andra och betydligt
-//	// större grafer.
-//
-//	// @formatter:off
-//	// graph G {
-//	// A -- A [label=1]; A -- G [label=3]; G -- B [label=28];
-//	// B -- F [label=5]; F -- F [label=3]; F -- H [label=1];
-//	// H -- D [label=1]; H -- I [label=3]; D -- I [label=1];
-//	// B -- D [label=2]; B -- C [label=3]; C -- D [label=5];
-//	// E -- C [label=2]; E -- D [label=2]; J -- D [label=5];
-//	// }
-//	// @formatter:on
-//
-//	private void createExampleGraph() {
-//		addExampleNodes();
-//
-//		connect("A", "A", 1);
-//		connect("A", "G", 3);
-//		connect("G", "B", 28);
-//		connect("B", "F", 5);
-//		connect("F", "F", 3);
-//		connect("F", "H", 1);
-//		connect("H", "D", 1);
-//		connect("H", "I", 3);
-//		connect("D", "I", 1);
-//		connect("B", "D", 2);
-//		connect("B", "C", 3);
-//		connect("C", "D", 5);
-//		connect("E", "C", 2);
-//		connect("E", "D", 2);
-//		connect("J", "D", 5);
-//	}
-//
-//	private void testPath(String start, String end, List<String> path) {
-//		assertEquals(start, path.get(0));
-//		assertEquals(end, path.get(path.size() - 1));
-//
-//		String previous = start;
-//		for (int i = 1; i < path.size(); i++) {
-//			assertTrue(graph.isConnected(previous, path.get(i)));
-//			previous = path.get(i);
-//		}
-//
-//		Set<String> nodesInPath = new HashSet<>(path);
-//		assertEquals(path.size(), nodesInPath.size());
-//	}
-//
-//	private void testDepthFirstSearch(String start, String end, int minimumPathLength) {
-//		createExampleGraph();
-//		List<String> path = graph.depthFirstSearch(start, end);
-////		System.out.println(path.size() + " pathSize " + minimumPathLength + " minimumPathLength");
-//
-//		assertTrue(path.size() >= minimumPathLength);
-//		assertTrue(path.size() <= graph.getNumberOfNodes());
-//
-//		testPath(start, end, path);
-//	}
-//
-//	@Test
-//	public void testDepthFirstSearchFromAToJ() {
-//		testDepthFirstSearch("A", "J", 5);
-//	}
-//
-//	@Test
-//	public void testDepthFirstSearchFromJToA() {
-//		testDepthFirstSearch("J", "A", 5);
-//	}
-//
-//	@Test
-//	public void testDepthFirstSearchFromFToE() {
-//		testDepthFirstSearch("F", "E", 3);
-//	}
-//
-//	@Test
-//	public void testDepthFirstSearchToSameNode() {
-//		for (String node : STANDARD_NODES) {
-//			graph = new MyUndirectedGraph<>();
-//			testDepthFirstSearch(node, node, 1);
-//		}
-//	}
-//
-//	private void testBreadthFirstSearch(String start, String end, int expectedathLength) {
-//		createExampleGraph();
-//		List<String> path = graph.breadthFirstSearch(start, end);
-//
-//		assertEquals(expectedathLength, path.size());
-//
-//		testPath(start, end, path);
-//	}
-//
-//	@Test
-//	public void testBreadthFirstSearchFromAToJ() {
-//		testBreadthFirstSearch("A", "J", 5);
-//	}
-//
-//	@Test
-//	public void testBreadthFirstSearchFromJToA() {
-//		testBreadthFirstSearch("J", "A", 5);
-//	}
-//
-//	@Test
-//	public void testBreadthFirstSearchFromFToE() {
-//		testBreadthFirstSearch("F", "E", 4);
-//	}
-//
-//	@Test
-//	public void testBreadthFirstSearchToSameNode() {
-//		for (String node : STANDARD_NODES) {
-//			graph = new MyUndirectedGraph<>();
-//			testBreadthFirstSearch(node, node, 1);
-//		}
-//	}
-//	
-//	@Test
-//	public void testConnection() {
-//		createExampleGraph();
-//
-////		MyNode<String> m=new MyNode<String>("B");
-//////		System.out.println(graph.nodes.contains(m) + " node m");
-////		System.out.println(graph.isConnected("B","G") + " B G");
-////		System.out.println(graph.isConnected("G","B") + " G B");
-////		System.out.println(graph.isConnected("F","H") + " F H");
-////		testBreadthFirstSearch("A", "A", 5);
-//
-//		assertTrue(graph.isConnected("G","B"));
-//		assertTrue(graph.isConnected("B","G"));
-//	}
-//
-//	@Test
-//	public void testMinimumSpanningTree() {
-//		createExampleGraph();
-//		UndirectedGraph<String> mst = graph.minimumSpanningTree();
-//
-//		int totalEdges = 0;
-//		int totalCost = 0;
-//
-//		for (char node1 = 'A'; node1 <= 'J'; node1++) {
-//			for (char node2 = node1; node2 <= 'J'; node2++) {
-//				int cost = mst.getCost("" + node1, "" + node2);
-//				if (cost > -1) {
-////					System.out.println(cost + " cost");
-//					totalEdges++;
-//					totalCost += cost;
-//				}
-//			}
-//		}
-//		assertEquals(9, totalEdges);
-//		assertEquals(45, totalCost);
-//	}
-//
-//	// Här börjar vi använda andra grafer
-//
-//	@Test
-//	public void testMinimumSpanningTreeFromBook() {
-//		add("V1", "V2", "V3", "V4", "V5", "V6", "V7");
-//		connect("V1", "V2", 2);
-//		connect("V1", "V3", 4);
-//		connect("V1", "V4", 1);
-//		connect("V2", "V4", 3);
-//		connect("V2", "V5", 10);
-//		connect("V3", "V4", 2);
-//		connect("V3", "V6", 5);
-//		connect("V4", "V5", 7);
-//		connect("V4", "V6", 8);
-//		connect("V4", "V7", 4);
-//		connect("V5", "V7", 6);
-//		connect("V6", "V7", 1);
-//
-//		UndirectedGraph<String> mst = graph.minimumSpanningTree();
-//
-//		int totalEdges = 0;
-//		int totalCost = 0;
-//
-//		for (int node1 = 1; node1 <= 7; node1++) {
-//			for (int node2 = node1; node2 <= 7; node2++) {
-//				int cost = mst.getCost("V" + node1, "V" + node2);
-//				if (cost > -1) {
-//					totalEdges++;
-//					totalCost += cost;
-//				}
-//			}
-//		}
-//
-//		assertEquals(16, totalCost);
-//	}
-//	@Test
-//	public void testMinimumSpanningTreeFromBookV() {
-//		add("V1", "V2", "V3", "V4", "V5", "V6", "V7");
-//		connect("V1", "V2", 2);
-//		connect("V1", "V3", 4);
-//		connect("V1", "V4", 1);
-//		connect("V2", "V4", 3);
-//		connect("V2", "V5", 10);
-//		connect("V3", "V4", 2);
-//		connect("V3", "V6", 5);
-//		connect("V4", "V5", 7);
-//		connect("V4", "V6", 8);
-//		connect("V4", "V7", 4);
-//		connect("V5", "V7", 6);
-//		connect("V6", "V7", 1);
-//		
-//		UndirectedGraph<String> mst = graph.minimumSpanningTree();
-//		
-//		int totalEdges = 0;
-//		int totalCost = 0;
-//		
-//		for (int node1 = 1; node1 <= 7; node1++) {
-//			for (int node2 = node1; node2 <= 7; node2++) {
-//				int cost = mst.getCost("V" + node1, "V" + node2);
-//				if (cost > -1) {
-//					totalEdges++;
-//					totalCost += cost;
-//				}
-//			}
-//		}
-//		
-//		assertEquals(16, totalCost);
-//	}
-//	@Test
-//	public void testCost() {
-//		createExampleGraph();
-//		int cost = graph.getCost("A", "G");
-//		int cost2 = graph.getCost("G", "A");
-//
-//		assertEquals(3, cost);
-//		assertEquals(3, cost2);
-//	}
 
+	@Test
+	public void getBinaryCodeOfByteTest() {
+		String str = "a";
+			byte[] byteArray = str.getBytes(Charset.forName("UTF-8"));
+			int size = byteArray.length;
+			StringBuffer returnBuffer = new StringBuffer();
+			for (int i = 0; i < size; i++) {
+				byte temp = byteArray[i];
+				returnBuffer.append(getStringOfByte(temp));
+			}
+			assertEquals("01100001" , returnBuffer.toString());
+		}
+	@Test
+	public void getBinaryCodeOfByteAATest() {
+		String str = "ab";
+		byte[] byteArray = str.getBytes(Charset.forName("UTF-8"));
+		int size = byteArray.length;
+		StringBuffer returnBuffer = new StringBuffer();
+		for (int i = 0; i < size; i++) {
+			byte temp = byteArray[i];
+			returnBuffer.append(getStringOfByte(temp));
+		}
+		assertEquals("0110000101100010" , returnBuffer.toString());
+	}
+	@Test
+	public void getStringFromBinaryCodeOfByteATest() {
+		String str = "a";
+		byte[] byteArray = str.getBytes(Charset.forName("UTF-8"));
+		int size = byteArray.length;
+		StringBuffer returnBuffer = new StringBuffer();
+		for (int i = 0; i < size; i++) {
+			byte temp = byteArray[i];
+			returnBuffer.append(getStringOfByte(temp));
+		}
+		String outputString = "";
+		 for(int index = 0; index < returnBuffer.length(); index+=8) {
+		     String temp = returnBuffer.substring(index, index+8);
+		     int num = Integer.parseInt(temp,2);
+		     char letter = (char) num;
+		     outputString +=letter;
+		 }
+		System.out.println("String from binary: " + outputString);
+		assertEquals("a" , outputString);
+	}
+	@Test
+	public void getStringFromBinaryCodeOfByteAATest() {
+		String str = "aa";
+		byte[] byteArray = str.getBytes(Charset.forName("UTF-8"));
+		int size = byteArray.length;
+		StringBuffer returnBuffer = new StringBuffer();
+		for (int i = 0; i < size; i++) {
+			byte temp = byteArray[i];
+			returnBuffer.append(getStringOfByte(temp));
+		}
+		String outputString = "";
+		for(int index = 0; index < returnBuffer.length(); index+=8) {
+			String temp = returnBuffer.substring(index, index+8);
+			int num = Integer.parseInt(temp,2);
+			char letter = (char) num;
+			outputString +=letter;
+		}
+		System.out.println("String from binary: " + outputString);
+		assertEquals("aa" , outputString);
+	}
 	
+	
+	private String getStringOfByte(byte b) {
+		StringBuffer returnBuffer = new StringBuffer();
+		for (int i = 0b111; i >= 0; i--) {
+			byte tmp = (byte) ((b >> i) & 0x1);
+			returnBuffer.append(tmp);
+		}
+		System.out.println("returnBuffer: " + returnBuffer);
+		return returnBuffer.toString();
+	}
+	
+	@Test
+	public void loadFileStringTest() throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(inputFileNameAbcd));
+		String str = new String (encoded, StandardCharsets.UTF_8);
+		System.out.println("StringFromByte: " + str);
+		assertEquals("abcd, efgh", str);
+	}
+	@Test
+	public void loadFileBytelengthTest() throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(inputFileNameAbcd));
+		String str = new String (encoded, StandardCharsets.UTF_8);
+		assertEquals(10, str.length());
+	}
+
+	@Test
+	public void readFileTest() throws IOException {
+		String path = "testFile.txt";
+		preEncode= huff.readFile(path, StandardCharsets.UTF_8);
+
+		assertTrue(null, path!=null);	
+		assertEquals("123456abcdef", preEncode.toString());	
+	}
+	@Test
+	public void encodedBinStringATest() throws IOException {
+		String path = "a.txt";
+		preEncode= huff.readFile(path, StandardCharsets.UTF_8);
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		System.out.println("Stats: " + stats);
+		String encodedBinString = huff.encode(preEncode, stats);
+		System.out.println("Encoded: " + encodedBinString);
+		assertEquals("0", encodedBinString);	
+	}
+	@Test
+	public void decodedBinStringATest() throws IOException {
+		preEncode= "a";
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		String encodedBinString = "0";
+		String decodedString = huff.decode(encodedBinString, stats);
+		assertEquals("a", decodedString);	
+	}
+	@Test
+	public void encodedBinStringAATest() throws IOException {
+		preEncode = "aa";//new String("aa", StandardCharsets.UTF_8);
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		System.out.println("Stats: " + stats);
+		String encodedBinString = huff.encode(preEncode, stats);
+		System.out.println("Encoded: " + encodedBinString);
+		assertEquals("00", encodedBinString);	
+	}
+	@Test
+	public void decodedBinStringAATest() throws IOException {
+		preEncode= "aa";
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		String encodedBinString = "00";
+		String decodedString = huff.decode(encodedBinString, stats);
+		System.out.println("Decoded: " + decodedString);
+		assertEquals("aa", decodedString);	
+	}
+
+	@Test
+	public void encodedBinStringTest() throws IOException {
+		String path = "abcd.txt";
+		preEncode= huff.readFile(path, StandardCharsets.UTF_8);
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		System.out.println("Stats: " + stats);
+		String encodedBinString = huff.encode(preEncode, stats);
+		System.out.println("Encoded: " + encodedBinString);
+		assertEquals("0010111110101110111000101001111000", encodedBinString);	
+	}
+	@Test
+	public void decodedBinStringTest() throws IOException {
+		preEncode= "abcd, efgh";
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		String encodedBinString = "0010111110101110111000101001111000";
+		String decodedString = huff.decode(encodedBinString, stats);
+		System.out.println("Decoded string: " + decodedString);
+		assertEquals("abcd, efgh", decodedString);	
+	}
+	@Test
+	public void encodedBinStringBigFileTest() throws IOException {
+		String path = "inFile.txt";
+		preEncode= huff.readFile(path, StandardCharsets.UTF_8);
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		System.out.println("Stats: " + stats);
+		String encodedBinString = huff.encode(preEncode, stats);
+		assertTrue(preEncode.length() < encodedBinString.length());	
+	}
+	
+	@Test
+	public void decodedBinStringBigFileTest() throws IOException {
+		String path = inputFileName;
+		preEncode= huff.readFile(path, StandardCharsets.UTF_8);
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		String encodedBinString = huff.encode(preEncode, stats);
+		String decodedString = huff.decode(encodedBinString, stats);
+		assertEquals(preEncode, decodedString);	
+		assertTrue(encodedBinString.length() > decodedString.length());	
+	}
+	@Test
+	public void writeEncodedFileTest() throws IOException {
+		String path = inputFileName;
+		File pathFile = new File(path);
+		preEncode= huff.readFile(path, StandardCharsets.UTF_8);
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		System.out.println("Stats: " + stats);
+		String encodedBinString = huff.encode(preEncode, stats);
+		File encodedFile = new File(encodedOutputFileName);
+	        if(encodedFile.delete()){
+	        }else {
+	        	System.out.println(encodedOutputFileName +" doesn't exists in project root directory");
+	        }
+		outStream = new FileOutputStream(encodedOutputFileName);
+		writer = new OutputStreamWriter(outStream);
+		writer.write(encodedBinString);
+		System.out.println(encodedOutputFileName +" written to Project root directory");
+		writer.flush();
+		writer.close();
+		assertTrue(encodedFile.exists() && encodedFile.length() > pathFile.length());	
+	}
+	
+	@Test
+	public void writeDecodedFileTest() throws IOException {
+		String path = inputFileName;
+		File pathFile = new File(path);
+		preEncode= huff.readFile(path, StandardCharsets.UTF_8);
+		Map<Character, Integer> stats = huff.stats(preEncode.toCharArray());
+		String encodedBinString = huff.encode(preEncode, stats);
+		String decodedString = huff.decode(encodedBinString, stats);
+		File decodedFile = new File(decodedOutputFileName);
+		if(decodedFile.delete()){
+			System.out.println(decodedOutputFileName +" deleted from Project root directory");
+		}else {
+			System.out.println(decodedOutputFileName +" doesn't exists in project root directory");
+		}
+		
+		outStream = new FileOutputStream(decodedOutputFileName);
+		writer = new OutputStreamWriter(outStream);
+		writer.write(decodedString);
+		System.out.println(decodedOutputFileName +" written to Project root directory");
+		writer.flush();
+		writer.close();
+		
+		assertTrue(decodedFile.exists() && decodedFile.length() == pathFile.length());	
+	}
+
+	@Test
+	public void putBMapTest() {
+		String s = "aabaaa";
+		Map<Character, Integer> testMap = huff.stats(s.toCharArray());
+		assertTrue(testMap.containsKey('b'));
+	}
+
+	@Test
+	public void putAMapTest() {
+		String s = "aabaaa";
+		Map<Character, Integer> testMap = huff.stats(s.toCharArray());
+		assertTrue(testMap.containsKey('a'));
+	}
+
+	@Test
+	public void frequencyTest() {
+		String s = "aabaaa";
+		Map<Character, Integer> testMap = huff.stats(s.toCharArray());
+		if(testMap.containsKey('a')) {
+			assertEquals(5, testMap.get('a').intValue());
+		}
+
+
+	}
 
 }
